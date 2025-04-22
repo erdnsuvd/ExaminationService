@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -68,11 +69,30 @@ public class ExaminationServiceImpl implements ExaminationService {
                     savedExam.getPatient().getSisiID(),
                     savedExam.getMedicalStaff().getId(),
                     savedExam.getCreatedAt().toString(),
-                    savedExam.getUpdatedAt().toString()
-            );
+                    savedExam.getUpdatedAt().toString());
 
         } catch (Exception e) {
             throw new RuntimeException("Үзлэг нэмэхэд алдаа гарлаа: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Examination getExaminationById(String id) {
+        return examinationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "Үзлэгийн мэдээлэл олдсонгүй. ID: " + id));
+    }
+
+    @Override
+    public List<Examination> getExaminationsByUserId(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new RuntimeException("Хэрэглэгчийн ID хоосон байна");
+        }
+        List<Examination> exams = examinationRepository.findByUserId(userId);
+        if (exams.isEmpty()) {
+            throw new RuntimeException(
+                    "Хэрэглэгчийн үзлэгийн мэдээлэл олдсонгүй. ID: " + userId);
+        }
+        return exams;
     }
 }
